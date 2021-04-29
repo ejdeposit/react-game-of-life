@@ -3,6 +3,20 @@ import './App.css';
 import reactDom from 'react-dom';
 import React from 'react';
 
+import Terminal from 'react-animated-term'
+import 'react-animated-term/dist/react-animated-term.css'
+
+const termLines = [
+  {
+    'text': 'John Conway\'s Game of Life',
+    'cmd': true
+  },
+  {
+    'text': '',
+    'cmd': true
+  }
+]
+
 function mod(a, b){return ((a % b) + b) % b;}
 
 class Cell extends React.Component {
@@ -15,10 +29,10 @@ class Cell extends React.Component {
 
   render(){
     if(this.props.aliveCells[this.props.cellID]){
-      return <div className="alive cell" onClick={this.props.onClick}>{this.props.cellID}</div>
+      return <div className="alive cell" onClick={this.props.onClick}></div>
     }
     else{
-      return <div className="dead cell" onClick={this.props.onClick}>{this.props.cellID}</div>
+      return <div className="dead cell" onClick={this.props.onClick}></div>
     }
   }
 }
@@ -182,7 +196,17 @@ class Game extends React.Component {
 
 function App() {
   return (
-    <Game size="10"/>
+    <div>
+      <div className="terminal">
+      <Terminal
+          className="term"
+          lines={termLines}
+          interval={100}
+          height={100}
+        />
+      </div>
+      <Game size="10"/>
+    </div>
   );
 }
 
