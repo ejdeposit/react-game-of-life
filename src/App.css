@@ -36,7 +36,9 @@
     transform: rotate(360deg);
   }
 }
-
+.row {
+  display: table;
+}
 .cell {
   border: 1px solid #999;
   float: left;
@@ -52,9 +54,13 @@
 }
 
 .alive {
-  background: #000;
+  background: #76ed4c;
 }
 
 .dead {
-  background: #fff;
+  background: #000;
+}
+body {
+  background: #000;
+  color:#76ed4c;
 }

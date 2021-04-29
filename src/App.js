@@ -23,34 +23,6 @@ class Cell extends React.Component {
   }
 }
 
-class Row extends React.Component {
-  constructor(props){
-    super(props);
-    this.state = {
-      //TO DO should size and row number be props?
-      size: parseInt(props.size),
-      rowNumber: parseInt(props.rowNumber),
-    };
-  }
-
-  render(){
-    const nNumbers = Array.from(Array(this.state.size).keys());
-    const cellsList = nNumbers.map((number) =>
-      <Cell 
-        key={this.state.rowNumber.toString() + "-" + number.toString()} 
-        cellID={this.state.rowNumber + "-" + number.toString()} 
-        onClick={() => this.props.onClick(this.state.rowNumber + "-" + number.toString())}
-        aliveCells ={this.props.aliveCells}
-      />
-    );
-    return (
-          <div>
-            {cellsList}
-          </div>
-    );
-  }
-}
-
 class Game extends React.Component {
   constructor(props){
     super(props);
@@ -62,18 +34,21 @@ class Game extends React.Component {
       }
     }
     this.handleClick = this.handleClick.bind(this)
+    this.pauseResume = this.pauseResume.bind(this)
     this.state = {
       turn: 1,
       size: parseInt(props.size),
       aliveCells: cells,
+      pause: true,
     };
   }
-
   componentDidMount() {
-    this.timerID = setInterval(
-      () => this.tick(),
-      5000
-    );
+    if(!this.state.pause){
+        this.timerID = setInterval(
+          () => this.tick(),
+          1000
+        );
+    }
   }
 
   componentWillUnmount() {
@@ -154,25 +129,52 @@ class Game extends React.Component {
     this.setState({aliveCells: cells});
   }
 
+  renderRow(row, size){
+    const nNumbers = Array.from(Array(size).keys());
+    const rowList = nNumbers.map((number) =>
+     <Cell 
+         key={row.toString() + "-" + number.toString()} 
+         cellID={row.toString() + "-" + number.toString()}
+         aliveCells ={this.state.aliveCells}
+         onClick={() => this.handleClick(row.toString() + "-" + number.toString())}
+     />
+    );
+
+    return rowList;
+  }
+  pauseResume(){
+    //console.log(this.state.pause)
+    if(this.state.pause){
+      this.timerID = setInterval(
+        () => this.tick(),
+        1000
+      );
+      //set state
+      this.setState({
+        pause: false,
+      });
+    }
+    else{
+      clearInterval(this.timerID);
+      this.setState({
+        pause: true,
+      });
+    }
+  }
+
   render(){
     const nNumbers = Array.from(Array(this.state.size).keys());
     const rowList = nNumbers.map((number) =>
-      <Row 
-        boardHandleClick={this.handleClick} 
-        rowNumber={number.toString()} 
-        size={this.state.size} 
-        key={number.toString()} 
-        onClick={(rowCol) => this.handleClick(rowCol)}
-        aliveCells={this.state.aliveCells}
-      />
+    <div key={number}>{this.renderRow(number, this.state.size)}</div>
     );
     return (
-          <div>
-          <tbody>
+        <div>
+          <div className="row">
             {rowList}
-          </tbody>
-          <text>{this.state.turn}</text>
           </div>
+          <div>Turn: {this.state.turn}</div>
+          <button onClick={this.pauseResume}>play/resume</button>
+        </div>
     );
   }
 }
