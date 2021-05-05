@@ -1,15 +1,43 @@
 import logo from './logo.svg';
-import './App.css';
 import reactDom from 'react-dom';
 import React from 'react';
 
 import Terminal from 'react-animated-term'
 import 'react-animated-term/dist/react-animated-term.css'
 
+import Button from 'react-bootstrap/Button';
+import ToggleButton from 'react-bootstrap/ToggleButton';
+
+import { BsFillPlayFill } from "react-icons/bs";
+import { BsFillPauseFill } from "react-icons/bs";
+
+import 'bootstrap/dist/css/bootstrap.min.css';
+import './App.css';
+
+const  timePeriod = 500;
+
+
+
 const termLines = [
   {
-    'text': 'John Conway\'s Game of Life',
+    'text': 'GameOfLife --help',
     'cmd': true
+  },
+  {
+    'text': '1. Any live cell with fewer than two live neighbours dies, as if by underpopulation. ',
+    'cmd': false
+  },
+  {
+    'text': '2. Any live cell with two or three live neighbours lives on to the next generation.',
+    'cmd': false
+  },
+  {
+    'text': '3. Any live cell with more than three live neighbours dies, as if by overpopulation.',
+    'cmd': false
+  },
+  {
+    'text': '4. Any dead cell with exactly three live neighbours becomes a live cell, as if by reproduction.',
+    'cmd': false
   },
   {
     'text': '',
@@ -60,7 +88,7 @@ class Game extends React.Component {
     if(!this.state.pause){
         this.timerID = setInterval(
           () => this.tick(),
-          1000
+          timePeriod
         );
     }
   }
@@ -111,22 +139,21 @@ class Game extends React.Component {
     let neighborsCount = 0
     let n = this.state.size 
 
-    let above = mod(row-1, n).toString() + "-" + col.toString();
-    let below = mod(row+1, n).toString() + "-" + col.toString();
-    let right = row.toString()+ "-" + mod(col+1, n).toString();
-    let left = row.toString() + "-" + mod(col-1, n).toString();
-    if(this.state.aliveCells[above]){
-      neighborsCount++;
-    }
-    if(this.state.aliveCells[below]){
-      neighborsCount++;
-    }
-    if(this.state.aliveCells[right]){
-      neighborsCount++;
-    }
-    if(this.state.aliveCells[left]){
-      neighborsCount++;
-    }
+    let north = mod(row-1, n).toString() + "-" + col.toString();
+    let south = mod(row+1, n).toString() + "-" + col.toString();
+    let east = row.toString()+ "-" + mod(col+1, n).toString();
+    let west = row.toString() + "-" + mod(col-1, n).toString();
+    let northWest = mod(row-1, n).toString() + "-" + mod(col-1, n).toString();
+    let northEast = mod(row-1, n).toString() + "-" + mod(col+1, n).toString();
+    let southWest = mod(row+1, n).toString() + "-" + mod(col+1, n).toString();
+    let southEast = mod(row+1, n).toString() + "-" + mod(col-1, n).toString();
+    let locations = [north, south, east, west, northWest, northEast, southWest, southEast]
+    locations.forEach(location => {
+      if(this.state.aliveCells[location]){
+        neighborsCount++;
+      }
+    })
+    //console.log(neighborsCount);
     return neighborsCount
 
   }
@@ -161,7 +188,7 @@ class Game extends React.Component {
     if(this.state.pause){
       this.timerID = setInterval(
         () => this.tick(),
-        1000
+        timePeriod
       );
       //set state
       this.setState({
@@ -176,18 +203,31 @@ class Game extends React.Component {
     }
   }
 
+  renderPlayIcon(){
+    if(this.state.pause){
+      return <BsFillPlayFill />
+    }
+    else{
+      return <BsFillPauseFill /> 
+    }
+  }
+
   render(){
     const nNumbers = Array.from(Array(this.state.size).keys());
     const rowList = nNumbers.map((number) =>
     <div key={number}>{this.renderRow(number, this.state.size)}</div>
     );
     return (
-        <div>
-          <div className="row">
-            {rowList}
+        <div id="game">
+          <div id="board">
+              {rowList}
           </div>
-          <div>Turn: {this.state.turn}</div>
-          <button onClick={this.pauseResume}>play/resume</button>
+          <div id="controls">
+            <Button onClick={()=>{this.pauseResume()}} variant="danger">
+              {this.renderPlayIcon()}
+            </Button>{' '}
+            <div>Turn: {this.state.turn}</div>
+          </div>
         </div>
     );
   }
@@ -197,15 +237,18 @@ class Game extends React.Component {
 function App() {
   return (
     <div>
-      <div className="terminal">
-      <Terminal
-          className="term"
-          lines={termLines}
-          interval={100}
-          height={100}
-        />
+      <div className="title">
+        <h1>Conway's Game of Life</h1>
       </div>
-      <Game size="10"/>
+      <div id="content">
+        <Terminal
+            className="term"
+            lines={termLines}
+            interval={100}
+            height={200}
+          />
+        <Game size="18"/>
+      </div>
     </div>
   );
 }
