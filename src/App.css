@@ -42,8 +42,10 @@
 /*
 #76ed4c
 */
+/*
+  */
 .cell {
-  border: 1px solid #76ed4c;
+  border: 1px solid #DDD;
   font-size: 8px;
   font-weight: bold;
   line-height: 25px;
@@ -54,7 +56,6 @@
   text-align: center;
   width: 25px;
 }
-
 .alive {
   background: #76ed4c;
 }

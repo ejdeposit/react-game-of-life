@@ -14,8 +14,10 @@ import { BsFillPauseFill } from "react-icons/bs";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
-const  timePeriod = 500;
+const  timePeriod = 300;
 
+const colors = ["#7fb170", "#fbdb63", "#faa16e", "#ed413c"]
+const colorCount = colors.size;
 
 
 const termLines = [
@@ -47,34 +49,46 @@ const termLines = [
 
 function mod(a, b){return ((a % b) + b) % b;}
 
-class Cell extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      alive: false,
-    };
-  }
-
-  render(){
-    if(this.props.aliveCells[this.props.cellID]){
-      return <div className="alive cell" onClick={this.props.onClick}></div>
-    }
-    else{
-      return <div className="dead cell" onClick={this.props.onClick}></div>
-    }
-  }
+function App() {
+  return (
+    <div>
+      <div className="title">
+        <h1>Conway's Game of Life</h1>
+      </div>
+      <div id="content">
+        <Terminal
+            className="term"
+            lines={termLines}
+            interval={100}
+            height={200}
+          />
+        <Game size="18"/>
+      </div>
+    </div>
+  );
 }
 
 class Game extends React.Component {
   constructor(props){
     super(props);
     let n =  parseInt(props.size);
-    let cells = new Object();
+
+    let cells = {};
     for(let i = 0; i < n; i++){
       for(let j = 0; j < n; j++){
         cells[i.toString() + "-" + j.toString()] = false;
       }
     }
+
+
+    //let color = cellColors[this.state.turn%cellColors.length]
+    let initCellColors = {};
+    for(let i = 0; i < n; i++){
+      for(let j = 0; j < n; j++){
+        initCellColors[i.toString() + "-" + j.toString()] = colors[0%colors.length];
+      }
+    }
+
     this.handleClick = this.handleClick.bind(this)
     this.pauseResume = this.pauseResume.bind(this)
     this.state = {
@@ -82,7 +96,9 @@ class Game extends React.Component {
       size: parseInt(props.size),
       aliveCells: cells,
       pause: true,
+      cellColors: initCellColors
     };
+    return;
   }
   componentDidMount() {
     if(!this.state.pause){
@@ -103,23 +119,24 @@ class Game extends React.Component {
       turn: turn
     });
 
+
     let cells = new Object();
     let n = this.state.size 
     for(let i = 0; i < n; i++){
       for(let j = 0; j < n; j++){
         let currentCell = i.toString() + "-" + j.toString()  
         let neighborCount = this.numberOfNeighbors(i, j)
-        //console.log(neighborCount)
 
-        if(this.state.aliveCells[currentCell]){
+        if(this.state.aliveCells[currentCell]){ // was alive
           if(neighborCount > 1 && neighborCount < 4){
             cells[currentCell] = true;
+            this.state.cellColors[currentCell] = colors[this.state.turn%colors.length]
           }
           else{
             cells[currentCell] = false;
           }
         }
-        else{
+        else{ //was dead
           if(neighborCount == 3){
             cells[currentCell] = true;
           }
@@ -129,7 +146,6 @@ class Game extends React.Component {
         }
       }
     }
-    //console.log(cells)
     this.setState({
       aliveCells: cells
     });
@@ -153,7 +169,6 @@ class Game extends React.Component {
         neighborsCount++;
       }
     })
-    //console.log(neighborsCount);
     return neighborsCount
 
   }
@@ -170,21 +185,22 @@ class Game extends React.Component {
     this.setState({aliveCells: cells});
   }
 
+  //TO DO - don't pass state of other cells to each cells
   renderRow(row, size){
     const nNumbers = Array.from(Array(size).keys());
     const rowList = nNumbers.map((number) =>
+         //color = {this.state.cellColors[row.toString() + "-" + number.toString()]}
      <Cell 
-         key={row.toString() + "-" + number.toString()} 
-         cellID={row.toString() + "-" + number.toString()}
-         aliveCells ={this.state.aliveCells}
+         key = {row.toString() + "-" + number.toString()} 
+         cellID = {row.toString() + "-" + number.toString()}
+         aliveCells = {this.state.aliveCells}
+         cellColors = {this.state.cellColors}
          onClick={() => this.handleClick(row.toString() + "-" + number.toString())}
      />
     );
-
     return rowList;
   }
   pauseResume(){
-    //console.log(this.state.pause)
     if(this.state.pause){
       this.timerID = setInterval(
         () => this.tick(),
@@ -232,26 +248,23 @@ class Game extends React.Component {
     );
   }
 }
+// TO DO - change cell to element it has no state any more
+class Cell extends React.Component {
+  constructor(props) {
+  
+    super(props);
+  }
 
+  render(){
+    let myColor = this.props.cellColors[this.props.cellID]
 
-function App() {
-  return (
-    <div>
-      <div className="title">
-        <h1>Conway's Game of Life</h1>
-      </div>
-      <div id="content">
-        <Terminal
-            className="term"
-            lines={termLines}
-            interval={100}
-            height={200}
-          />
-        <Game size="18"/>
-      </div>
-    </div>
-  );
+    if(this.props.aliveCells[this.props.cellID]){
+      return <div style={{background: myColor}} className="alive cell" onClick={this.props.onClick}></div>
+    }
+    else{
+      return <div className="dead cell" onClick={this.props.onClick}></div>
+    }
+  }
 }
-
 
 export default App;
