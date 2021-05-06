@@ -1,49 +1,40 @@
 .App {
   text-align: center;
 }
-
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+body{
+  padding: 25px;
+  font-family: monospace;
+  background: #000;
+  color:#dadada;
+}
+div#termScrollParent{
+  overflow: Scroll;
+}
+div#termScrollParent::-webkit-scrollbar {
+  display: none;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+/*
+div#termScrollChild{
+  overflow-y: scroll;
 }
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+*/
+div#game {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
 }
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+#game > div{
+  padding: 15px;
 }
 #board {
   display: flex;
 }
-/*
-#76ed4c
-*/
-/*
-  */
+div#controls{
+  padding-top: 10px;
+  padding-left: 20px;
+}
+#controls > div {
+  padding: 10px;
+}
 .cell {
   border: 1px solid #DDD;
   font-size: 8px;
@@ -63,22 +54,11 @@
 .dead {
   background: #000;
 }
-body {
-  font-family: monospace;
-  background: #000;
-  color:#dadada;
-}
-body {
-  background-color: black;
-}
-div#game {
-  padding: 20px;
-  display: flex;
-  align-items: flex-start;
-}
 /*
   border: 1px solid fuchsia;
   */
+/*
 div#game > div{
   padding: 15px;
 }
+*/

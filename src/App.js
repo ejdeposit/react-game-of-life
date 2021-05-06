@@ -42,6 +42,10 @@ const termLines = [
     'cmd': false
   },
   {
+    'text': 'Click on any live or dead cell to manually kill it or bring it to life respectively.  Press Play to begin the simulation',
+    'cmd': false
+  },
+  {
     'text': '',
     'cmd': true
   }
@@ -55,12 +59,14 @@ function App() {
         <h1>Conway's Game of Life</h1>
       </div>
       <div id="content">
-        <Terminal
+        <div id="termScrollParent">
+            <Terminal
             className="term"
             lines={termLines}
             interval={100}
             height={200}
-          />
+            />
+        </div>
         <Game size="18"/>
       </div>
     </div>
@@ -274,10 +280,15 @@ class Game extends React.Component {
               {rowList}
           </div>
           <div id="controls">
-            <Button onClick={this.
-            clearBoard} variant="warning"><BsFillTrashFill /></Button>
-            {this.renderPlayButton()}
             <div>Turn: {this.state.turn}</div>
+            <div>
+              {this.renderPlayButton()}
+            </div>
+            <div>
+              <Button onClick={this.clearBoard} variant="warning">
+                <BsFillTrashFill/>
+              </Button>
+            </div>
           </div>
         </div>
     );
