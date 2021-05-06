@@ -10,6 +10,7 @@ import ToggleButton from 'react-bootstrap/ToggleButton';
 
 import { BsFillPlayFill } from "react-icons/bs";
 import { BsFillPauseFill } from "react-icons/bs";
+import { BsFillTrashFill } from "react-icons/bs" 
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
@@ -18,7 +19,6 @@ const  timePeriod = 300;
 
 const colors = ["#7fb170", "#fbdb63", "#faa16e", "#ed413c"]
 const colorCount = colors.size;
-
 
 const termLines = [
   {
@@ -47,7 +47,6 @@ const termLines = [
   }
 ]
 
-function mod(a, b){return ((a % b) + b) % b;}
 
 function App() {
   return (
@@ -80,8 +79,6 @@ class Game extends React.Component {
       }
     }
 
-
-    //let color = cellColors[this.state.turn%cellColors.length]
     let initCellColors = {};
     for(let i = 0; i < n; i++){
       for(let j = 0; j < n; j++){
@@ -91,6 +88,7 @@ class Game extends React.Component {
 
     this.handleClick = this.handleClick.bind(this)
     this.pauseResume = this.pauseResume.bind(this)
+    this.clearBoard = this.clearBoard.bind(this)
     this.state = {
       turn: 1,
       size: parseInt(props.size),
@@ -100,6 +98,7 @@ class Game extends React.Component {
     };
     return;
   }
+
   componentDidMount() {
     if(!this.state.pause){
         this.timerID = setInterval(
@@ -118,7 +117,6 @@ class Game extends React.Component {
     this.setState({
       turn: turn
     });
-
 
     let cells = new Object();
     let n = this.state.size 
@@ -170,7 +168,6 @@ class Game extends React.Component {
       }
     })
     return neighborsCount
-
   }
 
   handleClick(rowCol) {
@@ -185,11 +182,9 @@ class Game extends React.Component {
     this.setState({aliveCells: cells});
   }
 
-  //TO DO - don't pass state of other cells to each cells
   renderRow(row, size){
     const nNumbers = Array.from(Array(size).keys());
     const rowList = nNumbers.map((number) =>
-         //color = {this.state.cellColors[row.toString() + "-" + number.toString()]}
      <Cell 
          key = {row.toString() + "-" + number.toString()} 
          cellID = {row.toString() + "-" + number.toString()}
@@ -200,13 +195,13 @@ class Game extends React.Component {
     );
     return rowList;
   }
+
   pauseResume(){
     if(this.state.pause){
       this.timerID = setInterval(
         () => this.tick(),
         timePeriod
       );
-      //set state
       this.setState({
         pause: false,
       });
@@ -228,6 +223,46 @@ class Game extends React.Component {
     }
   }
 
+  renderPlayButton(){
+    if(this.state.pause){
+      return (
+      <Button onClick={()=>{this.pauseResume()}} variant="success">
+        {this.renderPlayIcon()}
+      </Button>
+      );
+    }
+    else{
+      return (
+      <Button onClick={()=>{this.pauseResume()}} variant="danger">
+        {this.renderPlayIcon()}
+      </Button>
+      );
+    }
+  }
+
+  clearBoard(){
+    let n = this.state.size
+    let cells = {};
+    for(let i = 0; i < n; i++){
+      for(let j = 0; j < n; j++){
+        cells[i.toString() + "-" + j.toString()] = false;
+      }
+    }
+
+    let initCellColors = {};
+    for(let i = 0; i < n; i++){
+      for(let j = 0; j < n; j++){
+        initCellColors[i.toString() + "-" + j.toString()] = colors[0%colors.length];
+      }
+    }
+
+    this.setState({
+      turn: 1,
+      aliveCells: cells,
+      cellColors: initCellColors
+    });
+  }
+
   render(){
     const nNumbers = Array.from(Array(this.state.size).keys());
     const rowList = nNumbers.map((number) =>
@@ -239,32 +274,26 @@ class Game extends React.Component {
               {rowList}
           </div>
           <div id="controls">
-            <Button onClick={()=>{this.pauseResume()}} variant="danger">
-              {this.renderPlayIcon()}
-            </Button>{' '}
+            <Button onClick={this.
+            clearBoard} variant="warning"><BsFillTrashFill /></Button>
+            {this.renderPlayButton()}
             <div>Turn: {this.state.turn}</div>
           </div>
         </div>
     );
   }
 }
-// TO DO - change cell to element it has no state any more
-class Cell extends React.Component {
-  constructor(props) {
-  
-    super(props);
-  }
 
-  render(){
-    let myColor = this.props.cellColors[this.props.cellID]
-
-    if(this.props.aliveCells[this.props.cellID]){
-      return <div style={{background: myColor}} className="alive cell" onClick={this.props.onClick}></div>
+function Cell(props) {
+  let myColor = props.cellColors[props.cellID]
+    if(props.aliveCells[props.cellID]){
+      return <div style={{background: myColor}} className="alive cell" onClick={props.onClick}></div>;
     }
     else{
-      return <div className="dead cell" onClick={this.props.onClick}></div>
+      return <div className="dead cell" onClick={props.onClick}></div>
     }
-  }
 }
+
+function mod(a, b){return ((a % b) + b) % b;}
 
 export default App;
